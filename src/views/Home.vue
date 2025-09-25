@@ -1,10 +1,12 @@
 <script setup>
+import VideoSlider from '../components/VideoSlider.vue'
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl p-6">
+  <VideoSlider />
+  <div class="p-6 mt-8">
     <h1 class="text-3xl font-bold tracking-tight">Home</h1>
-    <p class="mt-2 text-gray-500 dark:text-gray-400">
+    <p class="mt-2 text-gray-500">
       Welcome to Trendbell. This page is styled with Tailwind CSS.
     </p>
     <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
