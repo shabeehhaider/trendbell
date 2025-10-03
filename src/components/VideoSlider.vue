@@ -1,21 +1,18 @@
 <template>
-  <div class="w-full gradient-background" style="height: 650px;">
+  <div class="w-full gradient-background hero">
     <Splide
       :options="{
-        type: 'loop',
+        type: 'fade',
+        rewind: true,
         autoplay: true,
-        interval: 30000,
+        interval: 7000,
+        speed: 800,
         pauseOnHover: false,
         pauseOnFocus: false,
         arrows: false,
         pagination: true,
-        height: '650px',
-        width: '100%',
-        cover: true,
-        fixedHeight: true,
       }"
       class="w-full"
-      style="height: 650px;"
       ref="splideRef"
       @moved="onSlideMoved"
     >
@@ -23,18 +20,16 @@
         v-for="(video, idx) in videos" 
         :key="video" 
         class="relative w-full overflow-hidden gradient-slide flex items-center justify-center"
-        style="height: 650px;"
       >
         <video
           :src="video"
-          class="w-full max-h-full object-contain"
-          style="height: 650px;"
+          class="w-full h-full object-cover"
           autoplay
           muted
           playsinline
           preload="metadata"
           @ended="onVideoEnded(idx, $event)"
-          ref="el => setVideoRef(idx, el)"
+          :ref="el => setVideoRef(idx, el)"
         ></video>
         <div class="absolute inset-0 gradient-overlay pointer-events-none"></div>
       </SplideSlide>
@@ -61,16 +56,17 @@ function setVideoRef(idx, el) {
 
 function onSlideMoved(newIdx) {
   currentSlide.value = newIdx
-  // Always play the video on the new slide
-  const vid = videoRefs.value[newIdx]
-  if (vid) {
-    vid.currentTime = 0
-    vid.play().catch(() => {})
-  }
+  videoRefs.value.forEach((v, i) => {
+    if (!v) return
+    if (i === newIdx) {
+      try { v.currentTime = 0; v.play() } catch (e) {}
+    } else {
+      try { v.pause() } catch (e) {}
+    }
+  })
 }
 
 function onVideoEnded(idx, event) {
-  // If the video ends before the interval, restart it (only for the active slide)
   if (idx === currentSlide.value) {
     event.target.currentTime = 0
     event.target.play().catch(() => {})
@@ -78,80 +74,84 @@ function onVideoEnded(idx, event) {
 }
 
 onMounted(() => {
-  // Set initial current slide
   currentSlide.value = 0
+  const vid = videoRefs.value[0]
+  if (vid) {
+    try { vid.currentTime = 0; vid.play() } catch (e) {}
+  }
 })
 </script>
 
 <style scoped>
-/* Lighter elegant gradient backgrounds */
 .gradient-background {
-  background: linear-gradient(135deg, 
-    #f3f4f6 0%, 
-    #e0e7ff 25%, 
-    #f1f5f9 50%, 
-    #e0e7ff 75%, 
-    #f3f4f6 100%);
-}
-
-.gradient-slide {
-  background: radial-gradient(ellipse at center, 
-    rgba(224, 231, 255, 0.3) 0%, 
-    rgba(241, 245, 249, 0.5) 50%, 
-    rgba(243, 244, 246, 0.8) 100%);
+  background: linear-gradient(180deg, #111827 0%, #0b0f1a 100%);
 }
 
 .gradient-overlay {
-  background: linear-gradient(
-    45deg,
-    rgba(236, 233, 254, 0.2) 0%,
-    transparent 30%,
-    transparent 70%,
-    rgba(224, 231, 255, 0.2) 100%
-  );
+  background: radial-gradient(circle at center, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.25) 100%);
 }
 
-.splide {
-  height: 650px !important;
+.hero {
+  position: relative;
+  z-index: 1;
+  height: 650px;
+  width: 100%;
+  overflow: hidden;
 }
-.splide__track {
-  height: 650px !important;
+
+@media (max-width: 1024px) { 
+  .hero { height: 520px; } 
 }
-.splide__list {
-  height: 650px !important;
+
+@media (max-width: 640px) { 
+  .hero { height: 380px; } 
 }
-.splide__slide {
-  height: 650px !important;
+
+.splide,
+.splide__track,
+.splide__list,
+.splide__slide { 
+  height: 100% !important; 
+  position: relative;
 }
+
+.gradient-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 video {
   width: 100% !important;
-  height: 650px !important;
-  object-fit: contain !important;
+  height: 100% !important;
+  object-fit: cover !important;
   object-position: center;
+  display: block;
 }
-.splide__pagination {
-  bottom: 2rem;
+
+.splide__pagination { 
+  bottom: 1.25rem; 
   z-index: 10;
+  position: absolute;
 }
+
 .splide__pagination__page {
-  width: 1.5rem;
-  height: 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(224, 231, 255, 0.6));
-  border: 2px solid rgba(224, 231, 255, 0.9);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  transition: all 0.4s ease;
-  margin: 0 0.5rem;
-  backdrop-filter: blur(10px);
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.6);
+  border: none;
+  margin: 0 6px;
+  opacity: 0.8;
+  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
 }
+
 .splide__pagination__page.is-active {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
-  border-color: #6366f1;
-  transform: scale(1.2);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2);
+  background: #ffffff;
+  transform: scale(1.4);
+  opacity: 1;
 }
-.splide__pagination__page:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(224, 231, 255, 0.7));
-  transform: scale(1.1);
-  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2);
+
+.splide__pagination__page:hover { 
+  opacity: 1; 
 }
 </style>
