@@ -62,7 +62,7 @@ const sections = computed(() =>
 
       <div class="grid gap-8 lg:grid-cols-2 lg:gap-14">
         <!-- Gallery -->
-        <div class="flex flex-col-reverse gap-3 sm:flex-row">
+        <div class="flex min-w-0 flex-col-reverse gap-3 sm:flex-row">
           <div v-if="product.images.length > 1" class="no-scrollbar flex gap-3 overflow-x-auto sm:w-20 sm:flex-col sm:overflow-visible">
             <button
               v-for="(img, i) in product.images"
@@ -89,7 +89,7 @@ const sections = computed(() =>
         </div>
 
         <!-- Details -->
-        <div class="lg:sticky lg:top-32 lg:self-start">
+        <div class="min-w-0 lg:sticky lg:top-32 lg:self-start">
           <p class="eyebrow">{{ getCategory(product.category)?.name }}</p>
           <h1 class="mt-2 font-display text-[1.75rem] font-semibold leading-tight sm:text-4xl">{{ product.name }}</h1>
           <p class="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 sm:mt-4">
